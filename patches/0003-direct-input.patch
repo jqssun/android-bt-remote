@@ -1,0 +1,311 @@
+From 132211c8da8361555414b30a27da245355e19f0a Mon Sep 17 00:00:00 2001
+From: jqssun <jqssun+git@googlemail.com>
+Date: Sat, 20 Sep 2025 15:42:48 -0700
+Subject: [PATCH] direct input
+
+
+diff --git a/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt b/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt
+index 761a488..f98f749 100644
+--- a/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt
++++ b/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt
+@@ -32,6 +32,7 @@ import androidx.compose.material.icons.rounded.Dialpad
+ import androidx.compose.material.icons.rounded.Favorite
+ import androidx.compose.material.icons.rounded.HealthAndSafety
+ import androidx.compose.material.icons.rounded.Home
++import androidx.compose.material.icons.rounded.Input
+ import androidx.compose.material.icons.rounded.Key
+ import androidx.compose.material.icons.rounded.Keyboard
+ import androidx.compose.material.icons.rounded.KeyboardArrowDown
+@@ -148,6 +149,7 @@ object AppIcons: KoinComponent {
+     val KeyboardArrowRight get() = Icons.AutoMirrored.Rounded.KeyboardArrowRight
+ 
+     val Send get() = Icons.AutoMirrored.Rounded.Send
++    val Input get() = Icons.Rounded.Input
+ 
+     // ---- Mouse ----
+ 
+diff --git a/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/AndroidKeyMapper.kt b/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/AndroidKeyMapper.kt
+new file mode 100644
+index 0000000..cfc5f1c
+--- /dev/null
++++ b/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/AndroidKeyMapper.kt
+@@ -0,0 +1,94 @@
++package com.atharok.btremote.domain.entities.remoteInput.keyboard
++
++import android.util.Log
++import androidx.compose.ui.input.key.Key
++import com.atharok.btremote.common.utils.REMOTE_INPUT_NONE
++
++object AndroidKeyMapper {
++    private val inputs: Map<Key, KeyboardKey> = mapOf(
++        Key.One to KeyboardKey.ROW_1_KEY_01,
++        Key.Two to KeyboardKey.ROW_1_KEY_02,
++        Key.Three to KeyboardKey.ROW_1_KEY_03,
++        Key.Four to KeyboardKey.ROW_1_KEY_04,
++        Key.Five to KeyboardKey.ROW_1_KEY_05,
++        Key.Six to KeyboardKey.ROW_1_KEY_06,
++        Key.Seven to KeyboardKey.ROW_1_KEY_07,
++        Key.Eight to KeyboardKey.ROW_1_KEY_08,
++        Key.Nine to KeyboardKey.ROW_1_KEY_09,
++        Key.Zero to KeyboardKey.ROW_1_KEY_10,
++        Key.Minus to KeyboardKey.ROW_1_KEY_11,
++        Key.Equals to KeyboardKey.ROW_1_KEY_12,
++        Key.Grave to KeyboardKey.ROW_1_KEY_00, // `
++        Key.Q to KeyboardKey.ROW_2_KEY_00,
++        Key.W to KeyboardKey.ROW_2_KEY_01,
++        Key.E to KeyboardKey.ROW_2_KEY_02,
++        Key.R to KeyboardKey.ROW_2_KEY_03,
++        Key.T to KeyboardKey.ROW_2_KEY_04,
++        Key.Y to KeyboardKey.ROW_2_KEY_05,
++        Key.U to KeyboardKey.ROW_2_KEY_06,
++        Key.I to KeyboardKey.ROW_2_KEY_07,
++        Key.O to KeyboardKey.ROW_2_KEY_08,
++        Key.P to KeyboardKey.ROW_2_KEY_09,
++        Key.LeftBracket to KeyboardKey.ROW_2_KEY_10,
++        Key.RightBracket to KeyboardKey.ROW_2_KEY_11,
++        Key.A to KeyboardKey.ROW_3_KEY_00,
++        Key.S to KeyboardKey.ROW_3_KEY_01,
++        Key.D to KeyboardKey.ROW_3_KEY_02,
++        Key.F to KeyboardKey.ROW_3_KEY_03,
++        Key.G to KeyboardKey.ROW_3_KEY_04,
++        Key.H to KeyboardKey.ROW_3_KEY_05,
++        Key.J to KeyboardKey.ROW_3_KEY_06,
++        Key.K to KeyboardKey.ROW_3_KEY_07,
++        Key.L to KeyboardKey.ROW_3_KEY_08,
++        Key.Semicolon to KeyboardKey.ROW_3_KEY_09,
++        Key.Apostrophe to KeyboardKey.ROW_3_KEY_10,
++        Key.Backslash to KeyboardKey.ROW_3_KEY_11,
++        Key.Z to KeyboardKey.ROW_4_KEY_01,
++        Key.X to KeyboardKey.ROW_4_KEY_02,
++        Key.C to KeyboardKey.ROW_4_KEY_03,
++        Key.V to KeyboardKey.ROW_4_KEY_04,
++        Key.B to KeyboardKey.ROW_4_KEY_05,
++        Key.N to KeyboardKey.ROW_4_KEY_06,
++        Key.M to KeyboardKey.ROW_4_KEY_07,
++        Key.Comma to KeyboardKey.ROW_4_KEY_08,
++        Key.Period to KeyboardKey.ROW_4_KEY_09,
++        Key.Slash to KeyboardKey.ROW_4_KEY_10,
++        Key.F1 to KeyboardKey.KEY_F1,
++        Key.F2 to KeyboardKey.KEY_F2,
++        Key.F3 to KeyboardKey.KEY_F3,
++        Key.F4 to KeyboardKey.KEY_F4,
++        Key.F5 to KeyboardKey.KEY_F5,
++        Key.F6 to KeyboardKey.KEY_F6,
++        Key.F7 to KeyboardKey.KEY_F7,
++        Key.F8 to KeyboardKey.KEY_F8,
++        Key.F9 to KeyboardKey.KEY_F9,
++        Key.F10 to KeyboardKey.KEY_F10,
++        Key.F11 to KeyboardKey.KEY_F11,
++        Key.F12 to KeyboardKey.KEY_F12,
++
++        // control keys
++        Key.Enter to KeyboardKey.KEY_ENTER,
++        Key.Escape to KeyboardKey.KEY_ESCAPE,
++        Key.Backspace to KeyboardKey.KEY_DELETE,
++        Key.Tab to KeyboardKey.KEY_TAB,
++        Key.Spacebar to KeyboardKey.KEY_SPACE_BAR,
++        Key.DirectionRight to KeyboardKey.KEY_RIGHT_ARROW,
++        Key.DirectionLeft to KeyboardKey.KEY_LEFT_ARROW,
++        Key.DirectionDown to KeyboardKey.KEY_DOWN_ARROW,
++        Key.DirectionUp to KeyboardKey.KEY_UP_ARROW,
++        Key.PrintScreen to KeyboardKey.KEY_PRINT_SCREEN,
++
++        // modifier keys
++        Key.ShiftLeft to KeyboardKey.KEY_SHIFT_LEFT,
++        Key.ShiftRight to KeyboardKey.KEY_SHIFT_RIGHT,
++        Key.MetaLeft to KeyboardKey.KEY_META_LEFT,
++        Key.MetaRight to KeyboardKey.KEY_META_RIGHT,
++        Key.CtrlLeft to KeyboardKey.KEY_CTRL_LEFT,
++        Key.CtrlRight to KeyboardKey.KEY_CTRL_RIGHT,
++        Key.AltLeft to KeyboardKey.KEY_ALT,
++        Key.AltRight to KeyboardKey.KEY_ALT_GR,
++        
++    )
++
++    fun getLinuxKey(key: Key): ByteArray = inputs[key]?.let { byteArrayOf(0x00, it.byte) } ?: run { Log.e("getLinuxKey()", "Not found: ${(key.keyCode ushr 32).toInt()}"); REMOTE_INPUT_NONE }
++}
+\ No newline at end of file
+diff --git a/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/virtualKeyboard/VirtualKeyboardLayout.kt b/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/virtualKeyboard/VirtualKeyboardLayout.kt
+index 1a7620e..24fb133 100644
+--- a/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/virtualKeyboard/VirtualKeyboardLayout.kt
++++ b/app/src/main/java/com/atharok/btremote/domain/entities/remoteInput/keyboard/virtualKeyboard/VirtualKeyboardLayout.kt
+@@ -1,5 +1,6 @@
+ package com.atharok.btremote.domain.entities.remoteInput.keyboard.virtualKeyboard
+ 
++import android.util.Log
+ import com.atharok.btremote.common.utils.REMOTE_INPUT_NONE
+ import com.atharok.btremote.domain.entities.remoteInput.keyboard.KeyboardKey
+ 
+@@ -21,5 +22,5 @@ abstract class VirtualKeyboardLayout {
+     protected abstract val keyboardInputs: Map<Char, ByteArray>
+     protected abstract val extraInputs: Map<Char, ByteArray>
+ 
+-    fun getKeyboardKey(key: Char): ByteArray = inputs[key] ?: REMOTE_INPUT_NONE
++    fun getKeyboardKey(key: Char): ByteArray = inputs[key] ?: run { Log.e("getKeyboardKey()", "Not found: $key for layout: ${this::class.simpleName}"); REMOTE_INPUT_NONE }
+ }
+\ No newline at end of file
+diff --git a/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt b/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
+index 74cd9f5..90d1c2c 100644
+--- a/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
++++ b/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
+@@ -616,7 +616,8 @@ private fun KeyboardModalBottomSheet(
+             mustClearInputField = mustClearInputField,
+             sendKeyboardKeyReport = sendKeyboardKeyReport,
+             sendTextReport = { sendTextReport(it, virtualKeyboardLayout) },
+-            onShowKeyboardBottomSheetChanged = onShowKeyboardChanged
++            onShowKeyboardBottomSheetChanged = onShowKeyboardChanged,
++            virtualKeyboardLayout = virtualKeyboardLayout
+         )
+     }
+ }
+diff --git a/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKeyboard.kt b/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKeyboard.kt
+index 0729018..1ccc152 100644
+--- a/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKeyboard.kt
++++ b/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKeyboard.kt
+@@ -26,6 +26,9 @@ import androidx.compose.ui.focus.focusRequester
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.graphics.Shape
+ import androidx.compose.ui.graphics.vector.ImageVector
++import androidx.compose.ui.input.key.key
++import androidx.compose.ui.input.key.onPreviewKeyEvent
++import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.platform.LocalLayoutDirection
+ import androidx.compose.ui.res.dimensionResource
+ import androidx.compose.ui.res.stringResource
+@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.LayoutDirection
+ import com.atharok.btremote.R
+ import com.atharok.btremote.common.utils.AppIcons
+ import com.atharok.btremote.common.utils.REMOTE_INPUT_NONE
++import com.atharok.btremote.domain.entities.remoteInput.keyboard.AndroidKeyMapper
+ import com.atharok.btremote.domain.entities.remoteInput.keyboard.virtualKeyboard.VirtualKeyboardLayout
+ import com.atharok.btremote.ui.theme.dimensionElevation3
+ 
+@@ -44,6 +48,7 @@ fun VirtualKeyboardModalBottomSheet(
+     sendKeyboardKeyReport: (ByteArray) -> Unit,
+     sendTextReport: (String) -> Unit,
+     onShowKeyboardBottomSheetChanged: (Boolean) -> Unit,
++    virtualKeyboardLayout: VirtualKeyboardLayout,
+     modifier: Modifier = Modifier
+ ) {
+     KeyboardModalBottomSheet(
+@@ -53,6 +58,7 @@ fun VirtualKeyboardModalBottomSheet(
+     ) {
+         val focusRequester = remember { FocusRequester() }
+         val textState = remember { mutableStateOf("") }
++        val directInputState = remember { mutableStateOf(false) }
+ 
+         LaunchedEffect(Unit) {
+             focusRequester.requestFocus()
+@@ -67,6 +73,9 @@ fun VirtualKeyboardModalBottomSheet(
+             },
+             sendKeyboardKeyReport = sendKeyboardKeyReport,
+             sendTextReport = sendTextReport,
++            directInputMode = directInputState.value,
++            onDirectInputModeChange = { directInputState.value = it },
++            virtualKeyboardLayout = virtualKeyboardLayout,
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .padding(dimensionResource(id = R.dimen.padding_medium))
+@@ -83,8 +92,13 @@ private fun StatelessKeyboardView(
+     onTextChange: (String) -> Unit,
+     sendKeyboardKeyReport: (ByteArray) -> Unit,
+     sendTextReport: (String) -> Unit,
++    directInputMode: Boolean,
++    onDirectInputModeChange: (Boolean) -> Unit,
++    virtualKeyboardLayout: VirtualKeyboardLayout,
+     modifier: Modifier = Modifier
+ ) {
++    val context = LocalContext.current
++
+     Column(modifier = modifier) {
+         Row(
+             modifier = Modifier
+@@ -92,13 +106,44 @@ private fun StatelessKeyboardView(
+                 .padding(bottom = dimensionResource(id = R.dimen.padding_medium)),
+             verticalAlignment = Alignment.CenterVertically
+         ) {
++            IconButton(
++                onClick = { onDirectInputModeChange(!directInputMode) },
++                modifier = Modifier
++                    .weight(1f)
++                    .padding(end = dimensionResource(id = R.dimen.padding_min))
++            ) {
++                Icon(
++                    imageVector = AppIcons.Input,
++                    contentDescription = stringResource(id = R.string.direct_input),
++                    tint = if (directInputMode) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.LocalContentColor.current
++                )
++            }
++
+             TextField(
+-                value = text,
+-                onValueChange = onTextChange,
++                value = if (directInputMode) "" else text,
++                onValueChange = if (directInputMode) {
++                    { newText ->
++                        if (newText.isNotEmpty()) {
++                            val char = newText.last()
++                            sendKeyboardKeyReport(virtualKeyboardLayout.getKeyboardKey(char))
++                            sendKeyboardKeyReport(REMOTE_INPUT_NONE)
++                        }
++                    }
++                } else onTextChange,
+                 modifier = Modifier
+                     .weight(4f)
+                     .padding(end = dimensionResource(id = R.dimen.padding_min))
+-                    .focusRequester(focusRequester),
++                    .focusRequester(focusRequester)
++                    .onPreviewKeyEvent { keyEvent ->
++                        if (directInputMode) {
++                            val mappedKey = AndroidKeyMapper.getLinuxKey(keyEvent.key)
++                            if (mappedKey != REMOTE_INPUT_NONE) {
++                                sendKeyboardKeyReport(mappedKey)
++                                sendKeyboardKeyReport(REMOTE_INPUT_NONE)
++                                true
++                            } else false
++                        } else false
++                    },
+                 keyboardOptions = KeyboardOptions.Default.copy(
+                     imeAction = ImeAction.Done
+                 ),
+@@ -119,17 +164,21 @@ private fun StatelessKeyboardView(
+             )
+             IconButton(
+                 onClick = {
+-                    sendTextReport(text)
+-                    if(mustClearInputField) {
+-                        onTextChange("")
++                    if(!directInputMode) {
++                        sendTextReport(text)
++                        if(mustClearInputField) {
++                            onTextChange("")
++                        }
+                     }
+                 },
+                 modifier = Modifier.weight(1f).padding(start = dimensionResource(id = R.dimen.padding_min))
+             ) {
+-                Icon(
+-                    imageVector = AppIcons.Send,
+-                    contentDescription = stringResource(id = R.string.send)
+-                )
++                if (!directInputMode) {
++                    Icon(
++                        imageVector = AppIcons.Send,
++                        contentDescription = stringResource(id = R.string.send)
++                    )
++                }
+             }
+         }
+ 
+diff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml
+index 6c023c1..f7c8c86 100644
+--- a/app/src/main/res/values/strings.xml
++++ b/app/src/main/res/values/strings.xml
+@@ -151,6 +151,7 @@
+     <string name="keyboard_bulgarian">Bulgarian</string>
+     <string name="keyboard_ukrainian">Ukrainian</string>
+     <string name="keyboard_persian">Persian</string>
++    <string name="direct_input">Direct Input</string>
+     <string name="send">Send</string>
+     <string name="enter">Enter</string>
+     <string name="escape">Esc</string>
