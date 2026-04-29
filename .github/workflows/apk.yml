@@ -1,0 +1,71 @@
+name: Generate APK
+
+env:
+  main_project_module: app
+
+on:
+  push:
+    branches:
+      - "release/**"
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "v*.*.*"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set TAG
+        if: github.event_name == 'push'
+        run: |
+          echo "version=$(echo '${{ github.ref_name }}' | awk -F 'v' '{print $2}')" >> $GITHUB_ENV
+
+      - name: Set TAG
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "version=$(echo '${{ inputs.version }}' | awk -F 'v' '{print $2}')" >> $GITHUB_ENV
+
+      - name: Use JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Patch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          chmod +x ./build.sh ./src/gradlew
+          ./build.sh && cd src
+          sed -i 's|applicationId = "com.atharok.btremote"|applicationId = "io.github.jqssun.btremote"|' app/build.gradle.kts
+          sed -i 's|versionCode = [0-9]\+|versionCode = 1|' app/build.gradle.kts
+          sed -i 's|versionName = "[^"]*"|versionName = "0.0.1"|' app/build.gradle.kts
+
+      - name: Build
+        run: |
+          cd src
+          echo ${{ secrets.STORE }} | base64 -d > upload.jks
+          echo ${{ secrets.LOCAL }} | base64 -d > local.properties
+          ./gradlew assembleDefaultRelease --stacktrace
+          rm upload.jks local.properties
+
+      - name: Publish (GitHub)
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: v${{ env.version }}
+          tag_name: v${{ env.version }}
+          files: |
+            src/${{ env.main_project_module }}/build/outputs/apk/default/release/app-default-release.apk

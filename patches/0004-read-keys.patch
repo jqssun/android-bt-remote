@@ -1,0 +1,48 @@
+From 3a92f5801c33f1cafbcaa20b9dd048385ccb0ff9 Mon Sep 17 00:00:00 2001
+From: jqssun <jqssun+git@googlemail.com>
+Date: Tue, 28 Apr 2026 21:54:17 -0700
+Subject: [PATCH] read keys
+
+---
+ app/build.gradle.kts | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 9cebee4..34a20d1 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -1,4 +1,5 @@
+ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
++import java.util.Properties
+ 
+ plugins {
+     alias(libs.plugins.androidApplication)
+@@ -6,6 +7,10 @@ plugins {
+     alias(libs.plugins.compose.compiler)
+ }
+ 
++val localProps = Properties().apply {
++    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
++}
++
+ android {
+     namespace = "com.atharok.btremote"
+     compileSdk = 36
+@@ -25,10 +30,10 @@ android {
+ 
+     signingConfigs {
+         create("release") {
+-            System.getenv("ANDROID_KEY_STORE_FILE")?.let { storeFile = file(it) }
+-            System.getenv("ANDROID_KEY_STORE_PASSWORD")?.let { storePassword = it }
+-            System.getenv("ANDROID_KEY_ALIAS")?.let { keyAlias = it }
+-            System.getenv("ANDROID_KEY_PASSWORD")?.let { keyPassword = it }
++            localProps.getProperty("storeFile")?.let { storeFile = file(it) }
++            localProps.getProperty("storePassword")?.let { storePassword = it }
++            localProps.getProperty("keyAlias")?.let { keyAlias = it }
++            localProps.getProperty("keyPassword")?.let { keyPassword = it }
+         }
+     }
+ 
+-- 
+2.53.0
+
