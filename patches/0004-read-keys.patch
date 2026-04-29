@@ -1,24 +1,19 @@
-From 3a92f5801c33f1cafbcaa20b9dd048385ccb0ff9 Mon Sep 17 00:00:00 2001
+From 4ab2d21a4ad7292f931b3d40c5023caf096e8e32 Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
 Date: Tue, 28 Apr 2026 21:54:17 -0700
 Subject: [PATCH] read keys
 
----
- app/build.gradle.kts | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 9cebee4..34a20d1 100644
+index b927492..01f78eb 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
-@@ -1,4 +1,5 @@
- import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+@@ -1,8 +1,14 @@
 +import java.util.Properties
- 
++
  plugins {
-     alias(libs.plugins.androidApplication)
-@@ -6,6 +7,10 @@ plugins {
-     alias(libs.plugins.compose.compiler)
+     alias(libs.plugins.android.application)
+     alias(libs.plugins.kotlin.compose)
  }
  
 +val localProps = Properties().apply {
@@ -27,8 +22,8 @@ index 9cebee4..34a20d1 100644
 +
  android {
      namespace = "com.atharok.btremote"
-     compileSdk = 36
-@@ -25,10 +30,10 @@ android {
+     compileSdk {
+@@ -24,10 +30,10 @@ android {
  
      signingConfigs {
          create("release") {
@@ -43,6 +38,3 @@ index 9cebee4..34a20d1 100644
          }
      }
  
--- 
-2.53.0
-

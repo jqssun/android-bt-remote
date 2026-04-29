@@ -50,8 +50,8 @@ jobs:
           chmod +x ./build.sh ./src/gradlew
           ./build.sh && cd src
           sed -i 's|applicationId = "com.atharok.btremote"|applicationId = "io.github.jqssun.btremote"|' app/build.gradle.kts
-          sed -i 's|versionCode = [0-9]\+|versionCode = 1|' app/build.gradle.kts
-          sed -i 's|versionName = "[^"]*"|versionName = "0.0.1"|' app/build.gradle.kts
+          sed -i 's|versionCode = [0-9]\+|versionCode = 2|' app/build.gradle.kts
+          sed -i 's|versionName = "[^"]*"|versionName = "0.0.2"|' app/build.gradle.kts
 
       - name: Build
         run: |

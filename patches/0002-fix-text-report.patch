@@ -1,52 +1,50 @@
-From 93d508463d2b40feea70294fef5db1746332a010 Mon Sep 17 00:00:00 2001
+From 73ad94ba487ee1fe57f58b79a88340487ba8d5e3 Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
-Date: Wed, 17 Sep 2025 09:38:58 -0700
+Date: Tue, 28 Apr 2026 21:11:04 -0700
 Subject: [PATCH] fix text report
 
 
 diff --git a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-index 25777b5..f78582e 100644
+index 8ce05b8..88c68fb 100644
 --- a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
 +++ b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-@@ -10,9 +10,9 @@ const val MOUSE_SPEED_DEFAULT_VALUE = 1.5f
- const val SOURCE_CODE_LINK = "https://gitlab.com/Atharok/BtRemote"
- const val WEB_SITE_LINK = "https://atharok.gitlab.io/site/projects/bt-remote/"
+@@ -42,8 +42,8 @@ const val USE_MOUSE_NAVIGATION_BY_DEFAULT = false
+ // ---- HID Descriptor ----
  
  const val KEYBOARD_REPORT_ID = 0x01
 -const val REMOTE_REPORT_ID = 0x02
  const val MOUSE_REPORT_ID = 0x02
 +const val REMOTE_REPORT_ID = 0x03
  
- const val DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS = 25L
+ val REMOTE_INPUT_NONE = byteArrayOf(0x00, 0x00)
  
-diff --git a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidProfile.kt b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidProfile.kt
-index 884b64e..437f647 100644
---- a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidProfile.kt
-+++ b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidProfile.kt
-@@ -14,6 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
- import com.atharok.btremote.common.extensions.dataStore
+diff --git a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
+index 820b81f..a682b5a 100644
+--- a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
++++ b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
+@@ -10,6 +10,7 @@ import android.content.Context
+ import androidx.annotation.RequiresPermission
  import com.atharok.btremote.common.utils.DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS
  import com.atharok.btremote.common.utils.KEYBOARD_REPORT_ID
 +import com.atharok.btremote.common.utils.MOUSE_REPORT_ID
  import com.atharok.btremote.common.utils.REMOTE_INPUT_NONE
  import com.atharok.btremote.common.utils.checkBluetoothConnectPermission
- import com.atharok.btremote.domain.entities.DeviceHidConnectionState
-@@ -166,12 +167,26 @@ class BluetoothHidProfile(
+ import com.atharok.btremote.common.utils.isMacAddress
+@@ -150,12 +151,25 @@ class BluetoothHidCore(
  
      // ---- Send Report ----
  
-+    private fun androidSendReport(device: BluetoothDevice, id: Int, bytes: ByteArray): Boolean {
-+        var success = false
-+        bluetoothHidDevice?.let { hidDevice ->
-+            if (checkBluetoothConnectPermission(context)) {
-+                val payload = when (id) {
-+                    MOUSE_REPORT_ID -> bytes + 0x00.toByte()
-+                    else -> bytes
-+                }
-+                success = hidDevice.sendReport(device, id, payload)
-+            }
++    private fun sendAndroidReport(
++        hidDevice: BluetoothHidDevice,
++        device: BluetoothDevice,
++        id: Int,
++        bytes: ByteArray
++    ): Boolean {
++        val payload = when (id) {
++            MOUSE_REPORT_ID -> bytes + 0x00.toByte()
++            else -> bytes
 +        }
-+        return success
++        return hidDevice.sendReport(device, id, payload)
 +    }
 +
      fun sendReport(id: Int, bytes: ByteArray): Boolean {
@@ -55,38 +53,29 @@ index 884b64e..437f647 100644
              bluetoothHidDevice?.let { hidDevice ->
                  if (checkBluetoothConnectPermission(context)) {
 -                    success = hidDevice.sendReport(device, id, bytes)
-+                    success = androidSendReport(device, id, bytes)
++                    success = sendAndroidReport(hidDevice, device, id, bytes)
                  }
              }
          }
-@@ -185,11 +201,11 @@ class BluetoothHidProfile(
+@@ -173,17 +187,17 @@ class BluetoothHidCore(
                  if (checkBluetoothConnectPermission(context)) {
                      success = true
                      text.forEach {
 -                        if(!hidDevice.sendReport(device, KEYBOARD_REPORT_ID, virtualKeyboardLayout.getKeyboardKey(it))) {
-+                        if(!androidSendReport(device, KEYBOARD_REPORT_ID, virtualKeyboardLayout.getKeyboardKey(it))) {
++                        if(!sendAndroidReport(hidDevice, device, KEYBOARD_REPORT_ID, virtualKeyboardLayout.getKeyboardKey(it))) {
                              success = false
                          }
                          delay(DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS)
 -                        hidDevice.sendReport(device, KEYBOARD_REPORT_ID, REMOTE_INPUT_NONE)
-+                        androidSendReport(device, KEYBOARD_REPORT_ID, REMOTE_INPUT_NONE)
++                        sendAndroidReport(hidDevice, device, KEYBOARD_REPORT_ID, REMOTE_INPUT_NONE)
                          delay(DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS)
                      }
+                     if(shouldSendEnter) {
+-                        hidDevice.sendReport(device, KEYBOARD_REPORT_ID, RemoteButtonProperties.KeyboardEnterButton.input)
++                        sendAndroidReport(hidDevice, device, KEYBOARD_REPORT_ID, RemoteButtonProperties.KeyboardEnterButton.input)
+                         delay(DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS)
+-                        hidDevice.sendReport(device, KEYBOARD_REPORT_ID, REMOTE_INPUT_NONE)
++                        sendAndroidReport(hidDevice, device, KEYBOARD_REPORT_ID, REMOTE_INPUT_NONE)
+                     }
                  }
-diff --git a/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt b/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt
-index 98463e2..93f13d5 100644
---- a/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt
-+++ b/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt
-@@ -66,10 +66,10 @@ class BluetoothHidViewModel(
-         xInt = max(xInt, -127)
-         yInt = max(yInt, -127)
-         val bytes: ByteArray = byteArrayOf(input.byte, xInt.toByte(), yInt.toByte(), wheel.roundToInt().toByte())
--        return sendReport(MOUSE_REPORT_ID, bytes + byteArrayOf(0x00))
-+        return sendReport(MOUSE_REPORT_ID, bytes)
-     }
- 
--    fun sendKeyboardKeyReport(bytes: ByteArray): Boolean = sendReport(KEYBOARD_REPORT_ID, byteArrayOf(0x00) + bytes + byteArrayOf(0x00, 0x00, 0x00, 0x00))
-+    fun sendKeyboardKeyReport(bytes: ByteArray): Boolean = sendReport(KEYBOARD_REPORT_ID, bytes)
- 
-     fun sendTextReport(text: String, virtualKeyboardLayout: VirtualKeyboardLayout) =
-         viewModelScope.launch(Dispatchers.Default) {
+             }

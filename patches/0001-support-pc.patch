@@ -1,36 +1,19 @@
-From 812ce3168b87fcdf167d85b10c14c3e0d0750f9a Mon Sep 17 00:00:00 2001
+From 7b622a3c4e6cbc26a43359e4bde64d9fcf383102 Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
-Date: Wed, 17 Sep 2025 08:43:22 -0700
+Date: Tue, 28 Apr 2026 21:10:56 -0700
 Subject: [PATCH] support pc
 
 
 diff --git a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-index 603bd1d..25777b5 100644
+index 8a39a20..8ce05b8 100644
 --- a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
 +++ b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-@@ -12,7 +12,7 @@ const val WEB_SITE_LINK = "https://atharok.gitlab.io/site/projects/bt-remote/"
+@@ -43,7 +43,7 @@ const val USE_MOUSE_NAVIGATION_BY_DEFAULT = false
  
  const val KEYBOARD_REPORT_ID = 0x01
  const val REMOTE_REPORT_ID = 0x02
 -const val MOUSE_REPORT_ID = 0x03
 +const val MOUSE_REPORT_ID = 0x02
  
- const val DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS = 25L
+ val REMOTE_INPUT_NONE = byteArrayOf(0x00, 0x00)
  
-diff --git a/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt b/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt
-index 93f13d5..98463e2 100644
---- a/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt
-+++ b/app/src/main/java/com/atharok/btremote/presentation/viewmodel/BluetoothHidViewModel.kt
-@@ -66,10 +66,10 @@ class BluetoothHidViewModel(
-         xInt = max(xInt, -127)
-         yInt = max(yInt, -127)
-         val bytes: ByteArray = byteArrayOf(input.byte, xInt.toByte(), yInt.toByte(), wheel.roundToInt().toByte())
--        return sendReport(MOUSE_REPORT_ID, bytes)
-+        return sendReport(MOUSE_REPORT_ID, bytes + byteArrayOf(0x00))
-     }
- 
--    fun sendKeyboardKeyReport(bytes: ByteArray): Boolean = sendReport(KEYBOARD_REPORT_ID, bytes)
-+    fun sendKeyboardKeyReport(bytes: ByteArray): Boolean = sendReport(KEYBOARD_REPORT_ID, byteArrayOf(0x00) + bytes + byteArrayOf(0x00, 0x00, 0x00, 0x00))
- 
-     fun sendTextReport(text: String, virtualKeyboardLayout: VirtualKeyboardLayout) =
-         viewModelScope.launch(Dispatchers.Default) {
