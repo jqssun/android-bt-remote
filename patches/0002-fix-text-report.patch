@@ -19,18 +19,10 @@ index 8ce05b8..88c68fb 100644
  val REMOTE_INPUT_NONE = byteArrayOf(0x00, 0x00)
  
 diff --git a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
-index 820b81f..a682b5a 100644
+index 820b81f..3b7ea30 100644
 --- a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
 +++ b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
-@@ -10,6 +10,7 @@ import android.content.Context
- import androidx.annotation.RequiresPermission
- import com.atharok.btremote.common.utils.DELAY_BETWEEN_KEY_PRESSES_IN_MILLIS
- import com.atharok.btremote.common.utils.KEYBOARD_REPORT_ID
-+import com.atharok.btremote.common.utils.MOUSE_REPORT_ID
- import com.atharok.btremote.common.utils.REMOTE_INPUT_NONE
- import com.atharok.btremote.common.utils.checkBluetoothConnectPermission
- import com.atharok.btremote.common.utils.isMacAddress
-@@ -150,12 +151,25 @@ class BluetoothHidCore(
+@@ -150,12 +150,21 @@ class BluetoothHidCore(
  
      // ---- Send Report ----
  
@@ -40,11 +32,7 @@ index 820b81f..a682b5a 100644
 +        id: Int,
 +        bytes: ByteArray
 +    ): Boolean {
-+        val payload = when (id) {
-+            MOUSE_REPORT_ID -> bytes + 0x00.toByte()
-+            else -> bytes
-+        }
-+        return hidDevice.sendReport(device, id, payload)
++        return hidDevice.sendReport(device, id, bytes)
 +    }
 +
      fun sendReport(id: Int, bytes: ByteArray): Boolean {
