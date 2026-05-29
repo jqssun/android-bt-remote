@@ -1,14 +1,14 @@
-From 7b622a3c4e6cbc26a43359e4bde64d9fcf383102 Mon Sep 17 00:00:00 2001
+From 486e920f3fcbdeb03ade2bffd7efce8b0092f3fe Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
 Date: Tue, 28 Apr 2026 21:10:56 -0700
 Subject: [PATCH] support pc
 
 
 diff --git a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-index 8a39a20..8ce05b8 100644
+index 51770bd..7a98304 100644
 --- a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
 +++ b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-@@ -43,7 +43,7 @@ const val USE_MOUSE_NAVIGATION_BY_DEFAULT = false
+@@ -46,7 +46,7 @@ const val USE_MOUSE_NAVIGATION_BY_DEFAULT = false
  
  const val KEYBOARD_REPORT_ID = 0x01
  const val REMOTE_REPORT_ID = 0x02

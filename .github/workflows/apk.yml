@@ -48,17 +48,14 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           chmod +x ./build.sh ./src/gradlew
-          ./build.sh && cd src
-          sed -i 's|applicationId = "com.atharok.btremote"|applicationId = "io.github.jqssun.btremote"|' app/build.gradle.kts
-          sed -i 's|versionCode = [0-9]\+|versionCode = 3|' app/build.gradle.kts
-          sed -i 's|versionName = "[^"]*"|versionName = "0.0.3"|' app/build.gradle.kts
+          ./build.sh
 
       - name: Build
         run: |
           cd src
           echo ${{ secrets.STORE }} | base64 -d > upload.jks
           echo ${{ secrets.LOCAL }} | base64 -d > local.properties
-          ./gradlew assembleDefaultRelease --stacktrace
+          ./gradlew assembleDefaultRelease bundleDefaultRelease --stacktrace
           rm upload.jks local.properties
 
       - name: Publish (GitHub)
@@ -69,3 +66,4 @@ jobs:
           tag_name: v${{ env.version }}
           files: |
             src/${{ env.main_project_module }}/build/outputs/apk/default/release/app-default-release.apk
+            src/${{ env.main_project_module }}/build/outputs/bundle/defaultRelease/app-default-release.aab

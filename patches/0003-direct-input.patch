@@ -1,4 +1,4 @@
-From d604c8d2e4a1f00213c8b27187a63bf0590e56d5 Mon Sep 17 00:00:00 2001
+From 77df7bc989e702e52e48ad29c61c45cd4ff6a1da Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
 Date: Tue, 28 Apr 2026 21:11:31 -0700
 Subject: [PATCH] direct input
@@ -25,10 +25,10 @@ index 1c9ec30..99ed6b8 100644
      // ---- Mouse ----
  
 diff --git a/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt b/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
-index c5c4deb..6119a50 100644
+index 8b5189f..b1cd4e6 100644
 --- a/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
 +++ b/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
-@@ -476,7 +476,8 @@ private fun KeyboardModalBottomSheet(
+@@ -460,7 +460,8 @@ private fun KeyboardModalBottomSheet(
              sendTextReport = { text: String, shouldSendEnter: Boolean ->
                  sendTextReport(text, virtualKeyboardLayout, shouldSendEnter)
              },
@@ -303,14 +303,21 @@ index c49c7e0..2d386d2 100644
  
          CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 diff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml
-index 715065e..9e2c401 100644
+index e87d48a..2b2cb89 100644
 --- a/app/src/main/res/values/strings.xml
 +++ b/app/src/main/res/values/strings.xml
-@@ -162,6 +162,7 @@
-     <string name="keyboard_bulgarian">Bulgarian</string>
+@@ -165,6 +165,7 @@
      <string name="keyboard_ukrainian">Ukrainian</string>
      <string name="keyboard_persian">Persian</string>
+     <string name="keyboard_arabic">Arabic</string>
 +    <string name="direct_input">Direct Input</string>
      <string name="send">Send</string>
      <string name="enter">Enter</string>
      <string name="escape">Esc</string>
+@@ -329,4 +330,4 @@
+     <string name="kotlin_serialization_id" translatable="false">org.jetbrains.kotlinx:kotlinx-serialization-json</string>
+     <string name="kotlin_serialization_url" translatable="false">https://github.com/Kotlin/kotlinx.serialization</string>
+ 
+-</resources>
+\ No newline at end of file
++</resources>

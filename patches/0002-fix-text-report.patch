@@ -1,14 +1,14 @@
-From 73ad94ba487ee1fe57f58b79a88340487ba8d5e3 Mon Sep 17 00:00:00 2001
+From 5ebb7680ad7ec1c4110849f0e01e21a969a5f1ed Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
 Date: Tue, 28 Apr 2026 21:11:04 -0700
 Subject: [PATCH] fix text report
 
 
 diff --git a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-index 8ce05b8..88c68fb 100644
+index 7a98304..f0533e3 100644
 --- a/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
 +++ b/app/src/main/java/com/atharok/btremote/common/utils/Constants.kt
-@@ -42,8 +42,8 @@ const val USE_MOUSE_NAVIGATION_BY_DEFAULT = false
+@@ -45,8 +45,8 @@ const val USE_MOUSE_NAVIGATION_BY_DEFAULT = false
  // ---- HID Descriptor ----
  
  const val KEYBOARD_REPORT_ID = 0x01
@@ -19,7 +19,7 @@ index 8ce05b8..88c68fb 100644
  val REMOTE_INPUT_NONE = byteArrayOf(0x00, 0x00)
  
 diff --git a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
-index 820b81f..3b7ea30 100644
+index 820b81f..2e2ec96 100644
 --- a/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
 +++ b/app/src/main/java/com/atharok/btremote/data/bluetooth/BluetoothHidCore.kt
 @@ -150,12 +150,21 @@ class BluetoothHidCore(
@@ -45,7 +45,7 @@ index 820b81f..3b7ea30 100644
                  }
              }
          }
-@@ -173,17 +187,17 @@ class BluetoothHidCore(
+@@ -173,17 +182,17 @@ class BluetoothHidCore(
                  if (checkBluetoothConnectPermission(context)) {
                      success = true
                      text.forEach {
