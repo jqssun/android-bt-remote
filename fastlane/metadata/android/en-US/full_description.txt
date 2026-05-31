@@ -1,0 +1,12 @@
+Remote turns any Android device into a Bluetooth (Classic) HID keyboard, mouse, and trackpad for all platforms that accept generic Bluetooth input. 
+The following platforms are supported:
+- Android 4 and later
+- Android TV, Google TV, and Fire OS
+- ChromeOS
+- iOS 13 (iPadOS 13) and later
+- iOS 4 and later (keyboard only)
+- tvOS 9.2 and later
+- Mac OS X 10.3 and later
+- Linux kernel 2.6 and later
+- SteamOS
+- Windows XP Service Pack 2 and later
