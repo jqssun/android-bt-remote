@@ -1,11 +1,11 @@
-From 5f1f8ff8458dcb6898eba8301e123d8280bbd9da Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: jqssun <jqssun+git@googlemail.com>
 Date: Tue, 28 Apr 2026 21:54:17 -0700
 Subject: [PATCH] read keys
 
 
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 9ca6634..9d6a594 100644
+index 2dde8de..c515e20 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -1,8 +1,14 @@
