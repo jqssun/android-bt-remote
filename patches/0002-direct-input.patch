@@ -8,36 +8,24 @@ diff --git a/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt b/a
 index 1c9ec30..99ed6b8 100644
 --- a/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt
 +++ b/app/src/main/java/com/atharok/btremote/common/utils/AppIcons.kt
-@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
- import androidx.compose.material.icons.automirrored.rounded.Backspace
- import androidx.compose.material.icons.automirrored.rounded.BluetoothSearching
+@@ -7,2 +7,3 @@ import androidx.compose.material.icons.automirrored.rounded.BluetoothSearching
  import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 +import androidx.compose.material.icons.automirrored.rounded.Input
  import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
- import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
- import androidx.compose.material.icons.automirrored.rounded.KeyboardReturn
-@@ -165,6 +166,7 @@ object AppIcons {
-     val KeyboardPageDown get() = Icons.Rounded.KeyboardDoubleArrowDown
- 
+@@ -167,2 +168,3 @@ object AppIcons {
      val Send get() = Icons.AutoMirrored.Rounded.Send
 +    val Input get() = Icons.AutoMirrored.Rounded.Input
- 
-     // ---- Mouse ----
  
 diff --git a/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt b/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
 index 8b5189f..b1cd4e6 100644
 --- a/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
 +++ b/app/src/main/java/com/atharok/btremote/ui/screens/RemoteScreen.kt
-@@ -460,7 +460,8 @@ private fun KeyboardModalBottomSheet(
-             sendTextReport = { text: String, shouldSendEnter: Boolean ->
-                 sendTextReport(text, virtualKeyboardLayout, shouldSendEnter)
+@@ -462,3 +462,4 @@ private fun KeyboardModalBottomSheet(
              },
 -            onShowKeyboardBottomSheetChanged = onShowKeyboardChanged
 +            onShowKeyboardBottomSheetChanged = onShowKeyboardChanged,
 +            virtualKeyboardLayout = virtualKeyboardLayout
          )
-     }
- }
 diff --git a/app/src/main/java/com/atharok/btremote/ui/views/keyboard/AndroidKeyMapper.kt b/app/src/main/java/com/atharok/btremote/ui/views/keyboard/AndroidKeyMapper.kt
 new file mode 100644
 index 0000000..15c76f0
@@ -146,77 +134,47 @@ diff --git a/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKey
 index c49c7e0..2d386d2 100644
 --- a/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKeyboard.kt
 +++ b/app/src/main/java/com/atharok/btremote/ui/views/keyboard/VirtualKeyboard.kt
-@@ -12,6 +12,10 @@ import androidx.compose.foundation.shape.CircleShape
- import androidx.compose.foundation.shape.RoundedCornerShape
- import androidx.compose.foundation.text.KeyboardActions
+@@ -14,2 +14,6 @@ import androidx.compose.foundation.text.KeyboardActions
  import androidx.compose.foundation.text.KeyboardOptions
 +import androidx.compose.material3.Icon
 +import androidx.compose.material3.IconButton
 +import androidx.compose.material3.LocalContentColor
 +import androidx.compose.material3.MaterialTheme
  import androidx.compose.material3.OutlinedTextField
- import androidx.compose.runtime.Composable
- import androidx.compose.runtime.CompositionLocalProvider
-@@ -22,6 +26,9 @@ import androidx.compose.ui.Alignment
- import androidx.compose.ui.Modifier
- import androidx.compose.ui.focus.FocusRequester
+@@ -24,2 +28,5 @@ import androidx.compose.ui.focus.FocusRequester
  import androidx.compose.ui.focus.focusRequester
 +import androidx.compose.ui.input.key.KeyEventType
 +import androidx.compose.ui.input.key.onPreviewKeyEvent
 +import androidx.compose.ui.input.key.type
  import androidx.compose.ui.platform.LocalLayoutDirection
- import androidx.compose.ui.res.dimensionResource
- import androidx.compose.ui.res.stringResource
-@@ -30,8 +37,9 @@ import androidx.compose.ui.unit.Dp
- import androidx.compose.ui.unit.LayoutDirection
- import com.atharok.btremote.R
+@@ -32,4 +39,5 @@ import com.atharok.btremote.R
  import com.atharok.btremote.common.utils.AppIcons
 +import com.atharok.btremote.common.utils.REMOTE_INPUT_NONE
  import com.atharok.btremote.domain.entities.remoteInput.RemoteButtonProperties
 -import com.atharok.btremote.ui.components.BasicIconButton
 +import com.atharok.btremote.domain.entities.remoteInput.keyboard.virtualKeyboard.VirtualKeyboardLayout
  import com.atharok.btremote.ui.components.customButtons.RemoteIconSurfaceButton
- import com.atharok.btremote.ui.theme.surfaceElevationHigh
- 
-@@ -41,6 +49,7 @@ fun VirtualKeyboardModalBottomSheet(
-     sendKeyboardKeyReport: (ByteArray) -> Unit,
-     sendTextReport: (String, Boolean) -> Unit,
+@@ -43,2 +51,3 @@ fun VirtualKeyboardModalBottomSheet(
      onShowKeyboardBottomSheetChanged: (Boolean) -> Unit,
 +    virtualKeyboardLayout: VirtualKeyboardLayout,
      modifier: Modifier = Modifier
- ) {
-     KeyboardModalBottomSheet(
-@@ -50,6 +59,7 @@ fun VirtualKeyboardModalBottomSheet(
-     ) {
-         val focusRequester = remember { FocusRequester() }
+@@ -52,2 +61,3 @@ fun VirtualKeyboardModalBottomSheet(
          val textState = remember { mutableStateOf("") }
 +        val directInputState = remember { mutableStateOf(false) }
  
-         LaunchedEffect(Unit) {
-             focusRequester.requestFocus()
-@@ -64,6 +74,9 @@ fun VirtualKeyboardModalBottomSheet(
-             },
-             sendKeyboardKeyReport = sendKeyboardKeyReport,
+@@ -66,2 +76,5 @@ fun VirtualKeyboardModalBottomSheet(
              sendTextReport = sendTextReport,
 +            directInputMode = directInputState.value,
 +            onDirectInputModeChange = { directInputState.value = it },
 +            virtualKeyboardLayout = virtualKeyboardLayout,
              modifier = Modifier
-                 .fillMaxWidth()
-                 .padding(dimensionResource(id = R.dimen.padding_medium))
-@@ -80,6 +93,9 @@ private fun StatelessKeyboardView(
-     onTextChange: (String) -> Unit,
-     sendKeyboardKeyReport: (ByteArray) -> Unit,
+@@ -82,2 +95,5 @@ private fun StatelessKeyboardView(
      sendTextReport: (String, Boolean) -> Unit,
 +    directInputMode: Boolean,
 +    onDirectInputModeChange: (Boolean) -> Unit,
 +    virtualKeyboardLayout: VirtualKeyboardLayout,
      modifier: Modifier = Modifier
- ) {
-     Column(
-@@ -93,38 +109,73 @@ private fun StatelessKeyboardView(
-             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
-             verticalAlignment = Alignment.CenterVertically
+@@ -95,8 +111,36 @@ private fun StatelessKeyboardView(
          ) {
 +            IconButton(
 +                onClick = { onDirectInputModeChange(!directInputMode) },
@@ -256,9 +214,7 @@ index c49c7e0..2d386d2 100644
 +                        } else false
 +                    },
                  keyboardOptions = KeyboardOptions.Default.copy(
-                     imeAction = ImeAction.Done
-                 ),
-                 keyboardActions = KeyboardActions(
+@@ -106,5 +150,7 @@ private fun StatelessKeyboardView(
                      onDone = {
 -                        sendTextReport(text, true)
 -                        if(mustClearInputField) {
@@ -269,9 +225,7 @@ index c49c7e0..2d386d2 100644
 +                                onTextChange("")
 +                            }
                          }
-                     }
-                 )
-             )
+@@ -114,15 +160,20 @@ private fun StatelessKeyboardView(
  
 -            BasicIconButton(
 +            IconButton(
@@ -300,23 +254,15 @@ index c49c7e0..2d386d2 100644
 +                )
 +            }
          }
- 
-         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 diff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml
 index e87d48a..2b2cb89 100644
 --- a/app/src/main/res/values/strings.xml
 +++ b/app/src/main/res/values/strings.xml
-@@ -165,6 +165,7 @@
-     <string name="keyboard_ukrainian">Ukrainian</string>
-     <string name="keyboard_persian">Persian</string>
+@@ -167,2 +167,3 @@
      <string name="keyboard_arabic">Arabic</string>
 +    <string name="direct_input">Direct Input</string>
      <string name="send">Send</string>
-     <string name="enter">Enter</string>
-     <string name="escape">Esc</string>
-@@ -329,4 +330,4 @@
-     <string name="kotlin_serialization_id" translatable="false">org.jetbrains.kotlinx:kotlinx-serialization-json</string>
-     <string name="kotlin_serialization_url" translatable="false">https://github.com/Kotlin/kotlinx.serialization</string>
+@@ -331,2 +332,2 @@
  
 -</resources>
 \ No newline at end of file
