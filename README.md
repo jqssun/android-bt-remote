@@ -12,7 +12,11 @@ It is built on top of the original [BT Remote designed for Android TV](https://g
 
 Unlike network remote-control tools, this does not require a companion application on the target. The Android device presents itself as a generic Bluetooth Human Interface Device (HID) and sends HID-compliant keyboard reports, media controls, and mouse input directly over Bluetooth.
 
-<video loop src='https://github.com/user-attachments/assets/0ea7c954-c50a-4e64-9d49-910abbab7b7e' alt="demo" width="1200" style="display: block; margin: auto;"></video>
+[<img height="48" alt="Get it on Google Play" src="https://jqssun.github.io/images/badges/google-play-store.svg">](https://play.google.com/store/apps/details?id=io.github.jqssun.btremote)
+[<img height="48" alt="Get it on F-Droid" src="https://jqssun.github.io/images/badges/fdroid.svg">](https://f-droid.org/packages/io.github.jqssun.btremote)
+[<img height="48" alt="Get it on GitHub" src="https://jqssun.github.io/images/badges/github.svg">](https://github.com/jqssun/android-bt-remote/releases/latest)
+
+<video loop src='https://github.com/user-attachments/assets/9bddf132-a861-4693-b408-2539646b7e8b' alt="demo" width="1200" style="display: block; margin: auto;"></video>
 
 ## Compatibility
 
